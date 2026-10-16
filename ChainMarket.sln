@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.37531.7 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChainMarket.Web", "ChainMarket.Web\ChainMarket.Web.csproj", "{FC237952-F8E4-4AA2-8649-0A870958EA43}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChainMarket.Tests", "ChainMarket.Tests\ChainMarket.Tests.csproj", "{F9AEADCC-58E5-4C28-803A-333D841CAB5F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{FC237952-F8E4-4AA2-8649-0A870958EA43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC237952-F8E4-4AA2-8649-0A870958EA43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC237952-F8E4-4AA2-8649-0A870958EA43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9AEADCC-58E5-4C28-803A-333D841CAB5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9AEADCC-58E5-4C28-803A-333D841CAB5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9AEADCC-58E5-4C28-803A-333D841CAB5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9AEADCC-58E5-4C28-803A-333D841CAB5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
