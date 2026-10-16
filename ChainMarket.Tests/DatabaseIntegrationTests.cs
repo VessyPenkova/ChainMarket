@@ -45,5 +45,45 @@ namespace ChainMarket.Tests
                     Is.EqualTo("Industrial roller chains"));
             });
         }
+
+        [Test]
+        public async Task ChainProduct_ShouldBelongToCategory()
+        {
+            using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using (var context = new ApplicationDbContext(options))
+            {
+                await context.Database.EnsureCreatedAsync();
+
+                var category = new Category { Name = "Ролкови вериги" };
+                var product = new ChainProduct
+                {
+                    Name = "Ролкова верига 08B-1",
+                    Category = category
+                };
+
+                context.ChainProducts.Add(product);
+                await context.SaveChangesAsync();
+            }
+
+            using var verificationContext = new ApplicationDbContext(options);
+
+            var savedProduct = await verificationContext.ChainProducts
+                .Include(p => p.Category)
+                .SingleAsync();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(savedProduct.Category, Is.Not.Null);
+                Assert.That(savedProduct.Category!.Name,
+                    Is.EqualTo("Ролкови вериги"));
+                Assert.That(savedProduct.CategoryId, Is.GreaterThan(0));
+            });
+        }
     }
 }

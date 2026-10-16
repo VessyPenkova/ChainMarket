@@ -121,6 +121,8 @@ namespace ChainMarket.Web.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.ToTable("ChainProducts");
                 });
 
@@ -228,6 +230,17 @@ namespace ChainMarket.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Suppliers");
+                });
+
+            modelBuilder.Entity("ChainMarket.Web.Models.ChainProduct", b =>
+                {
+                    b.HasOne("ChainMarket.Web.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
                 });
 #pragma warning restore 612, 618
         }

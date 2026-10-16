@@ -10,7 +10,11 @@ namespace ChainMarket.Web.Models
         [StringLength(150)]
         public string Name { get; set; } = string.Empty;
 
+        [Required]
+        [Range(1, int.MaxValue)]
         public int CategoryId { get; set; }
+
+        public Category? Category { get; set; }
 
         [StringLength(50)]
         public string? Standard { get; set; }
