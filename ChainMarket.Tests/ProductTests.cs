@@ -9,7 +9,7 @@ namespace ChainMarket.Tests
         public void Product_WithoutName_ShouldFailValidation()
         {
             // Arrange
-            var product = new Product { Name = "" };
+            var product = new ChainProduct { Name = "" };
             var results = new List<ValidationResult>();
 
             // Act

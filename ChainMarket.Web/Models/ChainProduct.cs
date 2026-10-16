@@ -2,7 +2,7 @@
 
 namespace ChainMarket.Web.Models
 {
-    public class Product
+    public class ChainProduct
     {
         public int Id { get; set; }
 
