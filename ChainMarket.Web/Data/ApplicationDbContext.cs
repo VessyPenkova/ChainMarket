@@ -13,7 +13,26 @@ namespace ChainMarket.Web.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Category>().HasData(
+                new Category { Id = 1, Name = "Ролкови вериги" },
+                new Category { Id = 2, Name = "Транспортьорни вериги" },
+                new Category { Id = 3, Name = "Подемни вериги" },
+                new Category { Id = 4, Name = "Селскостопански вериги" },
+                new Category { Id = 5, Name = "Неръждаеми и специални вериги" },
+                new Category { Id = 6, Name = "Свързващи звена и аксесоари" }
+            );
+            
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ChainStandard>()
+                .HasIndex(s => s.Code)
+                .IsUnique();
+
+            modelBuilder.Entity<ChainProduct>()
+                .HasOne(p => p.ChainStandard)
+                .WithMany()
+                .HasForeignKey(p => p.ChainStandardId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ChainProduct>()
                 .HasOne(p => p.Category)
@@ -50,9 +69,34 @@ namespace ChainMarket.Web.Data
                 .WithMany()
                 .HasForeignKey(o => o.ChainProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ChainProduct>()
+                .HasOne(p => p.ChainNomenclature)
+                .WithMany()
+                .HasForeignKey(p => p.ChainNomenclatureId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ChainNomenclature>()
+                .HasOne(n => n.Category)
+                .WithMany()
+                .HasForeignKey(n => n.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ChainNomenclature>()
+                .HasOne(n => n.ChainStandard)
+                .WithMany()
+                .HasForeignKey(n => n.ChainStandardId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ChainNomenclature>()
+                .HasIndex(n => new { n.CategoryId, n.Code })
+                .IsUnique();
         }
 
         public DbSet<Category> Categories { get; set; }
+        public DbSet<ChainStandard> ChainStandards { get; set; }
+
+        public DbSet<ChainNomenclature> ChainNomenclatures { get; set; }
         public DbSet<ChainProduct> ChainProducts { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<StockReceipt> StockReceipts { get; set; }

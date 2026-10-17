@@ -1,4 +1,5 @@
-﻿using ChainMarket.Web.Models;
+﻿
+using ChainMarket.Web.Models;
 
 namespace ChainMarket.Web.Services
 {
@@ -15,6 +16,24 @@ namespace ChainMarket.Web.Services
             return Math.Max(
                 0m,
                 order.TotalMeters - product.StockQuantityMeters);
+        }
+
+        public bool HasAvailableStock(
+            ChainProduct product, decimal quantity)
+        {
+            if (quantity <= 0)
+                return false;
+
+            return product.StockQuantity >= quantity;
+        }
+
+        public decimal GetMissingQuantity(
+            ChainProduct product, decimal quantity)
+        {
+            if (quantity <= 0)
+                throw new ArgumentOutOfRangeException(nameof(quantity));
+
+            return Math.Max(0m, quantity - product.StockQuantity);
         }
     }
 }

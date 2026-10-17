@@ -1,4 +1,5 @@
-﻿using ChainMarket.Web.Models;
+﻿
+using ChainMarket.Web.Models;
 
 namespace ChainMarket.Web.Services
 {
@@ -37,6 +38,22 @@ namespace ChainMarket.Web.Services
                 Status = "Draft",
                 Notes = "Prepared for customer advance order."
             };
+        }
+
+        public bool RequiresAdvanceOrder(
+            ChainProduct product,
+            decimal requestedQuantity)
+        {
+            return !stockService.HasAvailableStock(
+                product, requestedQuantity);
+        }
+
+        public decimal GetMissingQuantity(
+            ChainProduct product,
+            decimal requestedQuantity)
+        {
+            return stockService.GetMissingQuantity(
+                product, requestedQuantity);
         }
     }
 }

@@ -1,0 +1,228 @@
+﻿@model IEnumerable<ChainMarket.Web.Models.ChainProduct>
+
+@{
+    ViewData["Title"] = ViewBag.CategoryName ?? "Каталог машинни вериги";
+    var products = Model.Where(p => p.IsActive).ToList();
+}
+
+<a asp-controller="ChainProducts"
+   asp-action="Index"
+   class="catalog-back-link">
+    ← Всички категории
+</a>
+<section class="catalog-page">
+
+    <header class="catalog-header">
+        <h1>Каталог машинни вериги</h1>
+        <p>Индустриални вериги, компоненти и аксесоари</p>
+    </header>
+
+    <div class="catalog-filters">
+
+        <div class="catalog-filter">
+            <label for="categoryFilter">Категория</label>
+
+            <select id="categoryFilter" class="form-select">
+                <option value="">Всички категории</option>
+
+                @foreach (var category in products
+                                .Where(p => p.Category != null)
+                                .Select(p => p.Category!)
+                                .DistinctBy(c => c.Id)
+                                .OrderBy(c => c.Name))
+                {
+                    <option value="@category.Id">
+                        @category.Name
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="catalog-filter">
+            <label for="productSearch">Търсене</label>
+
+            <input id="productSearch"
+                   type="search"
+                   class="form-control"
+                   placeholder="Код или наименование..." />
+        </div>
+
+    </div>
+
+    <div class="product-grid" id="productGrid">
+
+        @foreach (var product in products)
+        {
+            var unit = product.SellingUnit == "pcs" ? "бр." : "м";
+
+            var price = product.SellingPricePerUnit
+            ?? product.SellingPricePerMeter;
+
+            var stock = product.StockQuantity;
+
+            <article class="product-card"
+                     data-category="@product.CategoryId"
+                     data-search="@($"{product.Name} {product.ChainCode}".ToLowerInvariant())">
+
+                <div class="product-image">
+
+                    @if (!string.IsNullOrWhiteSpace(product.ImagePath))
+                    {
+                        <img src="@Url.Content(product.ImagePath)"
+                             alt="@product.Name"
+                             loading="lazy" />
+                    }
+                    else
+                    {
+                        <div class="product-image-placeholder">
+                            <span>CHAINMARKET</span>
+                            <small>Снимка предстои</small>
+                        </div>
+                    }
+
+                </div>
+
+                <div class="product-info">
+
+                    <div class="product-category">
+                        @product.Category?.Name
+                    </div>
+
+                    <h2 class="product-title">
+                        @product.Name
+                    </h2>
+
+                    <div class="product-specifications">
+
+                        <div>
+                            <strong>Код:</strong>
+                            @(product.ChainCode ?? "—")
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(
+                                            product.ChainStandard?.Code ?? product.Standard))
+                        {
+                            <div>
+                                <strong>Стандарт:</strong>
+                                @(product.ChainStandard?.Code ?? product.Standard)
+                            </div>
+                        }
+
+                        @if (product.NumberOfStrands.HasValue)
+                        {
+                            <div>
+                                <strong>Брой редове:</strong>
+                                @product.NumberOfStrands
+                            </div>
+                        }
+
+                        @if (product.PitchMm > 0)
+                        {
+                            <div>
+                                <strong>Стъпка:</strong>
+                                @product.PitchMm мм
+                            </div>
+                        }
+
+                    </div>
+
+                    <div class="product-price">
+                        @price.ToString("F2") € / @unit
+                        <small>Без ДДС</small>
+                    </div>
+
+                    <div class="product-availability">
+
+                        @if (stock > 0)
+                        {
+                            <span class="in-stock">
+                                В наличност:
+                                @stock.ToString("0.##") @unit
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="on-request">
+                                По предварителна заявка
+                            </span>
+                        }
+
+                    </div>
+
+                    <div class="product-actions">
+                        <button type="button"
+                                class="btn btn-primary"
+                                disabled
+                                title="Функцията за поръчки предстои">
+                            Добави в количката
+                        </button>
+                    </div>
+
+                </div>
+
+            </article>
+        }
+
+    </div>
+
+    <p id="noProductsMessage"
+       class="catalog-empty"
+       hidden>
+        Няма намерени продукти.
+    </p>
+
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const categoryFilter =
+            document.getElementById("categoryFilter");
+
+        const productSearch =
+            document.getElementById("productSearch");
+
+        const cards =
+            document.querySelectorAll(".product-card");
+
+        const emptyMessage =
+            document.getElementById("noProductsMessage");
+
+        function filterProducts() {
+            const category = categoryFilter.value;
+            const search = productSearch.value
+                .trim()
+                .toLocaleLowerCase("bg");
+
+            let visibleCount = 0;
+
+            cards.forEach(function (card) {
+                const matchesCategory =
+                    !category || card.dataset.category === category;
+
+                const matchesSearch =
+                    card.dataset.search
+                        .toLocaleLowerCase("bg")
+                        .includes(search);
+
+                const visible =
+                    matchesCategory && matchesSearch;
+
+                card.hidden = !visible;
+
+                if (visible) {
+                    visibleCount++;
+                }
+            });
+
+            emptyMessage.hidden = visibleCount > 0;
+        }
+
+        categoryFilter.addEventListener(
+            "change", filterProducts);
+
+        productSearch.addEventListener(
+            "input", filterProducts);
+
+        filterProducts();
+    });
+</script>

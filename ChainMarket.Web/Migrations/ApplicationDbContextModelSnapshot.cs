@@ -35,6 +35,78 @@ namespace ChainMarket.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Ролкови вериги"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Транспортьорни вериги"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Подемни вериги"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Селскостопански вериги"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Неръждаеми и специални вериги"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Свързващи звена и аксесоари"
+                        });
+                });
+
+            modelBuilder.Entity("ChainMarket.Web.Models.ChainNomenclature", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ChainStandardId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(150)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("InnerWidthMm")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("PitchMm")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("RollerDiameterMm")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChainStandardId");
+
+                    b.HasIndex("CategoryId", "Code")
+                        .IsUnique();
+
+                    b.ToTable("ChainNomenclatures");
                 });
 
             modelBuilder.Entity("ChainMarket.Web.Models.ChainOrder", b =>
@@ -84,6 +156,12 @@ namespace ChainMarket.Web.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("ChainNomenclatureId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ChainStandardId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("CnCode")
                         .HasMaxLength(8)
                         .HasColumnType("TEXT");
@@ -97,15 +175,27 @@ namespace ChainMarket.Web.Migrations
                     b.Property<decimal>("InnerWidthMm")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ManufacturerId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("NumberOfStrands")
+                        .HasColumnType("INTEGER");
+
                     b.Property<decimal>("PitchMm")
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("PurchasePricePerMeter")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("PurchasePricePerUnit")
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("RollerDiameterMm")
@@ -114,8 +204,19 @@ namespace ChainMarket.Web.Migrations
                     b.Property<decimal>("SellingPricePerMeter")
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal?>("SellingPricePerUnit")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SellingUnit")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Standard")
                         .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("StockQuantity")
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("StockQuantityMeters")
@@ -125,7 +226,34 @@ namespace ChainMarket.Web.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("ChainNomenclatureId");
+
+                    b.HasIndex("ChainStandardId");
+
                     b.ToTable("ChainProducts");
+                });
+
+            modelBuilder.Entity("ChainMarket.Web.Models.ChainStandard", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("ChainStandards");
                 });
 
             modelBuilder.Entity("ChainMarket.Web.Models.PurchaseOrder", b =>
@@ -242,6 +370,24 @@ namespace ChainMarket.Web.Migrations
                     b.ToTable("Suppliers");
                 });
 
+            modelBuilder.Entity("ChainMarket.Web.Models.ChainNomenclature", b =>
+                {
+                    b.HasOne("ChainMarket.Web.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ChainMarket.Web.Models.ChainStandard", "ChainStandard")
+                        .WithMany()
+                        .HasForeignKey("ChainStandardId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Category");
+
+                    b.Navigation("ChainStandard");
+                });
+
             modelBuilder.Entity("ChainMarket.Web.Models.ChainOrder", b =>
                 {
                     b.HasOne("ChainMarket.Web.Models.ChainProduct", "ChainProduct")
@@ -261,7 +407,21 @@ namespace ChainMarket.Web.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("ChainMarket.Web.Models.ChainNomenclature", "ChainNomenclature")
+                        .WithMany()
+                        .HasForeignKey("ChainNomenclatureId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ChainMarket.Web.Models.ChainStandard", "ChainStandard")
+                        .WithMany()
+                        .HasForeignKey("ChainStandardId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Category");
+
+                    b.Navigation("ChainNomenclature");
+
+                    b.Navigation("ChainStandard");
                 });
 
             modelBuilder.Entity("ChainMarket.Web.Models.PurchaseOrder", b =>

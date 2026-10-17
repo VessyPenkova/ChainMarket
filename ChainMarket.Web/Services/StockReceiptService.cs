@@ -1,4 +1,5 @@
-﻿using ChainMarket.Web.Models;
+﻿
+using ChainMarket.Web.Models;
 
 namespace ChainMarket.Web.Services
 {
@@ -9,25 +10,33 @@ namespace ChainMarket.Web.Services
             StockReceipt receipt)
         {
             if (product.Id != receipt.ChainProductId)
-            {
                 throw new InvalidOperationException(
                     "The receipt does not match the product.");
-            }
 
             if (receipt.QuantityMeters <= 0)
-            {
                 throw new ArgumentOutOfRangeException(
                     nameof(receipt.QuantityMeters));
-            }
 
             if (product.StockQuantityMeters < 0)
-            {
                 throw new InvalidOperationException(
                     "Current stock cannot be negative.");
-            }
 
-            return product.StockQuantityMeters
-                   + receipt.QuantityMeters;
+            return product.StockQuantityMeters + receipt.QuantityMeters;
+        }
+
+        public decimal CalculateUpdatedStock(
+            ChainProduct product,
+            decimal receivedQuantity)
+        {
+            if (receivedQuantity <= 0)
+                throw new ArgumentOutOfRangeException(
+                    nameof(receivedQuantity));
+
+            if (product.StockQuantity < 0)
+                throw new InvalidOperationException(
+                    "Current stock cannot be negative.");
+
+            return product.StockQuantity + receivedQuantity;
         }
     }
 }

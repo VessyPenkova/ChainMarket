@@ -1,5 +1,6 @@
 using ChainMarket.Web.Data;
 using Microsoft.EntityFrameworkCore;
+using ChainMarket.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,5 +31,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
 
 app.Run();

@@ -1,7 +1,10 @@
 ﻿using ChainMarket.Web.Data;
 using ChainMarket.Web.Models;
+using ChainMarket.Web.Services;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using ChainMarket.Web.Controllers;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ChainMarket.Tests
 {
@@ -24,7 +27,7 @@ namespace ChainMarket.Tests
 
                 context.Categories.Add(new Category
                 {
-                    Name = "Ролкови вериги",
+                    Name = "Test Category",
                     Description = "Industrial roller chains"
                 });
 
@@ -35,12 +38,12 @@ namespace ChainMarket.Tests
             using var verificationContext = new ApplicationDbContext(options);
 
             var category = await verificationContext.Categories
-                .SingleAsync();
+                .SingleAsync(c => c.Name == "Test Category");
 
             // Assert
             Assert.Multiple(() =>
             {
-                Assert.That(category.Name, Is.EqualTo("Ролкови вериги"));
+                Assert.That(category.Name, Is.EqualTo("Test Category"));
                 Assert.That(category.Description,
                     Is.EqualTo("Industrial roller chains"));
             });
@@ -342,7 +345,8 @@ namespace ChainMarket.Tests
 
             using (var context = new ApplicationDbContext(options))
             {
-                var category = await context.Categories.SingleAsync();
+                var category = await context.Categories
+                    .SingleAsync(c => c.Id > 6 && c.Name == "Ролкови вериги");
 
                 context.Categories.Remove(category);
 
@@ -352,9 +356,286 @@ namespace ChainMarket.Tests
 
             using (var context = new ApplicationDbContext(options))
             {
-                Assert.That(await context.Categories.CountAsync(), Is.EqualTo(1));
+                Assert.That(await context.Categories.CountAsync(), Is.EqualTo(7));
                 Assert.That(await context.ChainProducts.CountAsync(), Is.EqualTo(1));
             }
+        }
+
+        [Test]
+        public async Task ChainProduct_ShouldSaveNormalizedStandard()
+        {
+            using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using (var context = new ApplicationDbContext(options))
+            {
+                await context.Database.EnsureCreatedAsync();
+
+                var standard = new ChainStandard { Code = "ISO 606" };
+
+                context.ChainProducts.Add(new ChainProduct
+                {
+                    Name = "Ролкова верига 10B-1",
+                    ChainCode = "10B-1",
+                    CategoryId = 1,
+                    ChainStandard = standard
+                });
+
+                await context.SaveChangesAsync();
+            }
+
+            using var verificationContext = new ApplicationDbContext(options);
+
+            var product = await verificationContext.ChainProducts
+                .Include(p => p.ChainStandard)
+                .SingleAsync();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(product.ChainStandard, Is.Not.Null);
+                Assert.That(product.ChainStandard!.Code, Is.EqualTo("ISO 606"));
+                Assert.That(product.ChainStandardId, Is.GreaterThan(0));
+            });
+        }
+
+
+        [Test]
+        public async Task ChainNomenclature_ShouldRejectDuplicateCodeWithinCategory()
+        {
+            using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using var context = new ApplicationDbContext(options);
+            await context.Database.EnsureCreatedAsync();
+
+            context.ChainNomenclatures.Add(new ChainNomenclature
+            {
+                Code = "08B-1",
+                CategoryId = 1
+            });
+
+            await context.SaveChangesAsync();
+
+            context.ChainNomenclatures.Add(new ChainNomenclature
+            {
+                Code = "08B-1",
+                CategoryId = 1
+            });
+
+            Assert.ThrowsAsync<DbUpdateException>(
+                async () => await context.SaveChangesAsync());
+        }
+
+        [Test]
+        public async Task ChainNomenclatureImport_ShouldNotCreateDuplicates()
+        {
+            using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using var context = new ApplicationDbContext(options);
+            await context.Database.EnsureCreatedAsync();
+
+            var importer = new ChainNomenclatureImportService(context);
+
+            var items = new[]
+            {
+                new ChainNomenclature { Code = "08B-1", CategoryId = 1 },
+                new ChainNomenclature { Code = "10B-1", CategoryId = 1 }
+            };
+            
+            int firstImport = await importer.ImportAsync(items);
+            int secondImport = await importer.ImportAsync(items);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(firstImport, Is.EqualTo(2));
+                Assert.That(secondImport, Is.EqualTo(0));
+                Assert.That(context.ChainNomenclatures.Count(), Is.EqualTo(2));
+            });
+        }
+
+        [Test]
+        public void StandardChainNomenclature_ShouldCoverAllSixCategories()
+        {
+            var items = StandardChainNomenclature.GetItems();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(items.Count, Is.EqualTo(82));
+
+                Assert.That(
+                    items.Select(x => x.CategoryId).Distinct().OrderBy(x => x),
+                    Is.EqualTo(Enumerable.Range(1, 6)));
+
+                Assert.That(
+                    items.GroupBy(x => new { x.CategoryId, x.Code })
+                        .All(g => g.Count() == 1),
+                    Is.True);
+            });
+        }
+
+        [Test]
+        public async Task ChainNomenclatureImport_ShouldImportAllSixCategories()
+        {
+            using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using var context = new ApplicationDbContext(options);
+            await context.Database.EnsureCreatedAsync();
+
+            var importer = new ChainNomenclatureImportService(context);
+            var items = StandardChainNomenclature.GetItems();
+
+            int firstImport = await importer.ImportAsync(items);
+            int secondImport = await importer.ImportAsync(
+                StandardChainNomenclature.GetItems());
+
+            Assert.That(secondImport, Is.EqualTo(0));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(firstImport, Is.EqualTo(82));
+
+                Assert.That(context.ChainNomenclatures.Count(), Is.EqualTo(82));
+
+                Assert.That(
+                    context.ChainNomenclatures
+                        .Select(n => n.CategoryId)
+                        .Distinct()
+                        .Count(),
+                    Is.EqualTo(6));
+            });
+        }
+
+
+        [Test]
+        public async Task ChainProduct_ShouldBelongToNomenclature()
+        {
+            using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using (var context = new ApplicationDbContext(options))
+            {
+                await context.Database.EnsureCreatedAsync();
+
+                var nomenclature = new ChainNomenclature
+                {
+                    Code = "08B-1",
+                    CategoryId = 1
+                };
+
+                context.ChainProducts.Add(new ChainProduct
+                {
+                    Name = "Ролкова верига 08B-1",
+                    CategoryId = 1,
+                    ChainNomenclature = nomenclature
+                });
+
+                await context.SaveChangesAsync();
+            }
+
+            using var verificationContext = new ApplicationDbContext(options);
+
+            var product = await verificationContext.ChainProducts
+                .Include(p => p.ChainNomenclature)
+                .SingleAsync();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(product.ChainNomenclature, Is.Not.Null);
+                Assert.That(product.ChainNomenclature!.Code, Is.EqualTo("08B-1"));
+                Assert.That(product.ChainNomenclatureId, Is.GreaterThan(0));
+            });
+        }
+
+
+        [Test]
+        public async Task ChainNomenclature_ShouldRejectWrongCategory()
+        {
+            using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using var context = new ApplicationDbContext(options);
+            await context.Database.EnsureCreatedAsync();
+
+            context.ChainNomenclatures.Add(new ChainNomenclature
+            {
+                Code = "08B-1",
+                CategoryId = 1
+            });
+
+            await context.SaveChangesAsync();
+
+            bool isValid = await context.ChainNomenclatures
+                .AnyAsync(n => n.Code == "08B-1" && n.CategoryId == 2);
+
+            Assert.That(isValid, Is.False);
+        }
+
+        [Test]
+        public async Task Create_ShouldRejectNomenclatureFromWrongCategory()
+        {
+            using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using var context = new ApplicationDbContext(options);
+            await context.Database.EnsureCreatedAsync();
+
+            context.ChainNomenclatures.Add(new ChainNomenclature
+            {
+                Code = "08B-1",
+                CategoryId = 1
+            });
+
+            await context.SaveChangesAsync();
+
+            var controller = new ChainProductsController(context);
+
+            var product = new ChainProduct
+            {
+                Name = "Test Chain",
+                CategoryId = 2,
+                ChainNomenclatureId = await context.ChainNomenclatures
+                    .Select(n => n.Id)
+                    .SingleAsync()
+            };
+
+            var result = await controller.Create(product);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.InstanceOf<ViewResult>());
+                Assert.That(controller.ModelState.IsValid, Is.False);
+                Assert.That(context.ChainProducts.Count(), Is.EqualTo(0));
+            });
         }
     }
 }

@@ -1,0 +1,64 @@
+﻿@model IEnumerable<ChainMarket.Web.Models.Category>
+
+@{
+    ViewData["Title"] = "Категории машинни вериги";
+}
+
+<section class="catalog-page">
+
+    <header class="catalog-header">
+        <h1>Машинни вериги и компоненти</h1>
+        <p>Изберете категория, за да разгледате продуктите.</p>
+    </header>
+
+    <div class="product-grid">
+
+        @foreach (var category in Model)
+        {
+            var image = category.Id switch
+            {
+                1 => "roller-chains.jpg",
+                2 => "conveyor-chains.jpg",
+                3 => "leaf-chains.jpg",
+                4 => "agricultural-chains.jpg",
+                5 => "stainless-chains.jpg",
+                6 => "connecting-links.jpg",
+                _ => ""
+            };
+
+            <a asp-controller="ChainProducts"
+               asp-action="Index"
+               asp-route-categoryId="@category.Id"
+               class="product-card category-card text-decoration-none">
+
+                <div class="product-image">
+
+                    @if (!string.IsNullOrEmpty(image))
+                    {
+                        <img src="@Url.Content("~/images/categories/" + image)"
+                             alt="@category.Name"
+                             loading="lazy"
+                             onerror="this.hidden=true; this.nextElementSibling.hidden=false;" />
+
+                        <div class="product-image-placeholder" hidden>
+                            <span>CHAINMARKET</span>
+                            <small>@category.Name</small>
+                        </div>
+                    }
+
+                </div>
+
+                <div class="product-info">
+                    <h2 class="product-title">@category.Name</h2>
+
+                    <span class="category-link">
+                        Разгледай продуктите →
+                    </span>
+                </div>
+
+            </a>
+        }
+
+    </div>
+
+</section>
