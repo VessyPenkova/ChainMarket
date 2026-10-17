@@ -195,6 +195,8 @@ namespace ChainMarket.Web.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("SupplierId");
+
                     b.ToTable("StockReceipts");
                 });
 
@@ -241,6 +243,17 @@ namespace ChainMarket.Web.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("ChainMarket.Web.Models.StockReceipt", b =>
+                {
+                    b.HasOne("ChainMarket.Web.Models.Supplier", "Supplier")
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Supplier");
                 });
 #pragma warning restore 612, 618
         }

@@ -11,6 +11,17 @@ namespace ChainMarket.Web.Data
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<StockReceipt>()
+                .HasOne(r => r.Supplier)
+                .WithMany()
+                .HasForeignKey(r => r.SupplierId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+
         public DbSet<Category> Categories { get; set; }
         public DbSet<ChainProduct> ChainProducts { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }

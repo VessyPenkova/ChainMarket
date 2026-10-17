@@ -85,5 +85,48 @@ namespace ChainMarket.Tests
                 Assert.That(savedProduct.CategoryId, Is.GreaterThan(0));
             });
         }
+
+        [Test]
+        public async Task StockReceipt_ShouldBelongToSupplier()
+        {
+            using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using (var context = new ApplicationDbContext(options))
+            {
+                await context.Database.EnsureCreatedAsync();
+
+                var supplier = new Supplier { Name = "Test Supplier" };
+
+                context.StockReceipts.Add(new StockReceipt
+                {
+                    Supplier = supplier,
+                    ChainProductId = 1,
+                    InvoiceNumber = "INV-001",
+                    InvoiceDate = DateTime.Today,
+                    QuantityMeters = 50m,
+                    PurchasePricePerMeter = 10m
+                });
+
+                await context.SaveChangesAsync();
+            }
+
+            using var verificationContext = new ApplicationDbContext(options);
+
+            var receipt = await verificationContext.StockReceipts
+                .Include(r => r.Supplier)
+                .SingleAsync();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(receipt.Supplier, Is.Not.Null);
+                Assert.That(receipt.Supplier!.Name, Is.EqualTo("Test Supplier"));
+                Assert.That(receipt.SupplierId, Is.GreaterThan(0));
+            });
+        }
     }
 }
