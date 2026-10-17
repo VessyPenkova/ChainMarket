@@ -102,10 +102,16 @@ namespace ChainMarket.Tests
 
                 var supplier = new Supplier { Name = "Test Supplier" };
 
+                var product = new ChainProduct
+                {
+                    Name = "Test Chain",
+                    Category = new Category { Name = "Ролкови вериги" }
+                };
+
                 context.StockReceipts.Add(new StockReceipt
                 {
                     Supplier = supplier,
-                    ChainProductId = 1,
+                    ChainProduct = product,
                     InvoiceNumber = "INV-001",
                     InvoiceDate = DateTime.Today,
                     QuantityMeters = 50m,
@@ -165,6 +171,54 @@ namespace ChainMarket.Tests
                 Assert.That(order.Supplier, Is.Not.Null);
                 Assert.That(order.Supplier!.Name, Is.EqualTo("Test Manufacturer"));
                 Assert.That(order.SupplierId, Is.GreaterThan(0));
+            });
+        }
+
+        [Test]
+        public async Task StockReceipt_ShouldBelongToChainProduct()
+        {
+            using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using (var context = new ApplicationDbContext(options))
+            {
+                await context.Database.EnsureCreatedAsync();
+
+                var product = new ChainProduct
+                {
+                    Name = "Ролкова верига 08B-1",
+                    Category = new Category { Name = "Ролкови вериги" }
+                };
+
+                context.StockReceipts.Add(new StockReceipt
+                {
+                    Supplier = new Supplier { Name = "Test Supplier" },
+                    ChainProduct = product,
+                    InvoiceNumber = "INV-002",
+                    InvoiceDate = DateTime.Today,
+                    QuantityMeters = 50m,
+                    PurchasePricePerMeter = 10m
+                });
+
+                await context.SaveChangesAsync();
+            }
+
+            using var verificationContext = new ApplicationDbContext(options);
+
+            var receipt = await verificationContext.StockReceipts
+                .Include(r => r.ChainProduct)
+                .SingleAsync();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(receipt.ChainProduct, Is.Not.Null);
+                Assert.That(receipt.ChainProduct!.Name,
+                    Is.EqualTo("Ролкова верига 08B-1"));
+                Assert.That(receipt.ChainProductId, Is.GreaterThan(0));
             });
         }
     }
