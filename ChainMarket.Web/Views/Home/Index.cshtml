@@ -1,8 +1,89 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Начало";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="home-hero">
+    <div class="home-hero-content">
+        <span class="home-eyebrow">CHAINMARKET</span>
+
+        <h1>Индустриални вериги и компоненти</h1>
+
+        <p>
+            Ролкови, транспортьорни, подемни,
+            селскостопански и специални вериги.
+            Намерете подходящия продукт по категория
+            и техническо означение.
+        </p>
+
+        <a asp-controller="ChainProducts"
+           asp-action="Index"
+           class="btn btn-primary btn-lg">
+            Разгледай каталога →
+        </a>
+    </div>
+</section>
+
+<section class="home-categories">
+    <div class="home-section-heading">
+        <h2>Нашите продукти</h2>
+        <p>Изберете категория, за да разгледате предложенията.</p>
+    </div>
+
+    <div class="home-category-grid">
+
+        <a asp-controller="ChainProducts"
+           asp-action="Index"
+           asp-route-categoryId="1"
+           class="home-category-card">
+            <img src="~/images/categories/roller-chains.jpg"
+                 alt="Ролкови вериги" />
+            <h3>Ролкови вериги</h3>
+        </a>
+
+        <a asp-controller="ChainProducts"
+           asp-action="Index"
+           asp-route-categoryId="2"
+           class="home-category-card">
+            <img src="~/images/categories/conveyor-chains.jpg"
+                 alt="Транспортьорни вериги" />
+            <h3>Транспортьорни вериги</h3>
+        </a>
+
+        <a asp-controller="ChainProducts"
+           asp-action="Index"
+           asp-route-categoryId="3"
+           class="home-category-card">
+            <img src="~/images/categories/leaf-chains.jpg"
+                 alt="Подемни вериги" />
+            <h3>Подемни вериги</h3>
+        </a>
+
+        <a asp-controller="ChainProducts"
+           asp-action="Index"
+           asp-route-categoryId="4"
+           class="home-category-card">
+            <img src="~/images/categories/agricultural-chains.jpg"
+                 alt="Селскостопански вериги" />
+            <h3>Селскостопански вериги</h3>
+        </a>
+
+        <a asp-controller="ChainProducts"
+           asp-action="Index"
+           asp-route-categoryId="5"
+           class="home-category-card">
+            <img src="~/images/categories/stainless-chains.jpg"
+                 alt="Неръждаеми и специални вериги" />
+            <h3>Неръждаеми и специални вериги</h3>
+        </a>
+
+        <a asp-controller="ChainProducts"
+           asp-action="Index"
+           asp-route-categoryId="6"
+           class="home-category-card">
+            <img src="~/images/categories/connecting-links.jpg"
+                 alt="Свързващи звена и аксесоари" />
+            <h3>Свързващи звена и аксесоари</h3>
+        </a>
+
+    </div>
+</section>
