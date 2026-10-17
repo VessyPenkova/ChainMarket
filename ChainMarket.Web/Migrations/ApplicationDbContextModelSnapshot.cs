@@ -258,7 +258,7 @@ namespace ChainMarket.Web.Migrations
                     b.HasOne("ChainMarket.Web.Models.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Category");

@@ -314,5 +314,47 @@ namespace ChainMarket.Tests
                 Assert.That(order.ChainProductId, Is.GreaterThan(0));
             });
         }
+
+        [Test]
+        public async Task Category_WithExistingProducts_ShouldNotBeDeleted()
+        {
+            using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using (var context = new ApplicationDbContext(options))
+            {
+                await context.Database.EnsureCreatedAsync();
+
+                var category = new Category { Name = "Ролкови вериги" };
+
+                context.ChainProducts.Add(new ChainProduct
+                {
+                    Name = "Ролкова верига 08B-1",
+                    Category = category
+                });
+
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ApplicationDbContext(options))
+            {
+                var category = await context.Categories.SingleAsync();
+
+                context.Categories.Remove(category);
+
+                Assert.ThrowsAsync<DbUpdateException>(
+                    async () => await context.SaveChangesAsync());
+            }
+
+            using (var context = new ApplicationDbContext(options))
+            {
+                Assert.That(await context.Categories.CountAsync(), Is.EqualTo(1));
+                Assert.That(await context.ChainProducts.CountAsync(), Is.EqualTo(1));
+            }
+        }
     }
 }

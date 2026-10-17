@@ -15,6 +15,12 @@ namespace ChainMarket.Web.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<ChainProduct>()
+                .HasOne(p => p.Category)
+                .WithMany()
+                .HasForeignKey(p => p.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<StockReceipt>()
                 .HasOne(r => r.Supplier)
                 .WithMany()
