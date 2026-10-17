@@ -66,6 +66,8 @@ namespace ChainMarket.Web.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ChainProductId");
+
                     b.ToTable("ChainOrders");
                 });
 
@@ -238,6 +240,17 @@ namespace ChainMarket.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Suppliers");
+                });
+
+            modelBuilder.Entity("ChainMarket.Web.Models.ChainOrder", b =>
+                {
+                    b.HasOne("ChainMarket.Web.Models.ChainProduct", "ChainProduct")
+                        .WithMany()
+                        .HasForeignKey("ChainProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ChainProduct");
                 });
 
             modelBuilder.Entity("ChainMarket.Web.Models.ChainProduct", b =>

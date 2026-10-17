@@ -9,6 +9,7 @@ namespace ChainMarket.Web.Models
         [Required]
         public int ChainProductId { get; set; }
 
+        public ChainProduct? ChainProduct { get; set; }
         [Required]
         [StringLength(150)]
         public string CustomerName { get; set; } = string.Empty;

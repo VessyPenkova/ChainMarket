@@ -269,5 +269,50 @@ namespace ChainMarket.Tests
                 Assert.That(order.ChainProductId, Is.GreaterThan(0));
             });
         }
+
+        [Test]
+        public async Task ChainOrder_ShouldBelongToChainProduct()
+        {
+            using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using (var context = new ApplicationDbContext(options))
+            {
+                await context.Database.EnsureCreatedAsync();
+
+                context.ChainOrders.Add(new ChainOrder
+                {
+                    CustomerName = "Test Customer",
+                    ChainProduct = new ChainProduct
+                    {
+                        Name = "Ролкова верига 08B-1",
+                        Category = new Category { Name = "Ролкови вериги" }
+                    },
+                    Quantity = 2,
+                    PackageSizeMeters = "10",
+                    SellingPricePerMeter = 15m
+                });
+
+                await context.SaveChangesAsync();
+            }
+
+            using var verificationContext = new ApplicationDbContext(options);
+
+            var order = await verificationContext.ChainOrders
+                .Include(o => o.ChainProduct)
+                .SingleAsync();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(order.ChainProduct, Is.Not.Null);
+                Assert.That(order.ChainProduct!.Name,
+                    Is.EqualTo("Ролкова верига 08B-1"));
+                Assert.That(order.ChainProductId, Is.GreaterThan(0));
+            });
+        }
     }
 }

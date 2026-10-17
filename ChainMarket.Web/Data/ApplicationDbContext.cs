@@ -38,6 +38,12 @@ namespace ChainMarket.Web.Data
                 .WithMany()
                 .HasForeignKey(p => p.ChainProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ChainOrder>()
+                .HasOne(o => o.ChainProduct)
+                .WithMany()
+                .HasForeignKey(o => o.ChainProductId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         public DbSet<Category> Categories { get; set; }
