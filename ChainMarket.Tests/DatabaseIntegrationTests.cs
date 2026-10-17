@@ -128,5 +128,44 @@ namespace ChainMarket.Tests
                 Assert.That(receipt.SupplierId, Is.GreaterThan(0));
             });
         }
+
+        [Test]
+        public async Task PurchaseOrder_ShouldBelongToSupplier()
+        {
+            using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using (var context = new ApplicationDbContext(options))
+            {
+                await context.Database.EnsureCreatedAsync();
+
+                context.PurchaseOrders.Add(new PurchaseOrder
+                {
+                    Supplier = new Supplier { Name = "Test Manufacturer" },
+                    ChainProductId = 1,
+                    QuantityMeters = 50m,
+                    PurchasePricePerMeter = 10m
+                });
+
+                await context.SaveChangesAsync();
+            }
+
+            using var verificationContext = new ApplicationDbContext(options);
+
+            var order = await verificationContext.PurchaseOrders
+                .Include(p => p.Supplier)
+                .SingleAsync();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(order.Supplier, Is.Not.Null);
+                Assert.That(order.Supplier!.Name, Is.EqualTo("Test Manufacturer"));
+                Assert.That(order.SupplierId, Is.GreaterThan(0));
+            });
+        }
     }
 }
