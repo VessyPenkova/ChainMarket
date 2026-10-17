@@ -152,7 +152,11 @@ namespace ChainMarket.Tests
                 context.PurchaseOrders.Add(new PurchaseOrder
                 {
                     Supplier = new Supplier { Name = "Test Manufacturer" },
-                    ChainProductId = 1,
+                    ChainProduct = new ChainProduct
+                    {
+                        Name = "Test Chain",
+                        Category = new Category { Name = "Ролкови вериги" }
+                    },
                     QuantityMeters = 50m,
                     PurchasePricePerMeter = 10m
                 });
@@ -219,6 +223,50 @@ namespace ChainMarket.Tests
                 Assert.That(receipt.ChainProduct!.Name,
                     Is.EqualTo("Ролкова верига 08B-1"));
                 Assert.That(receipt.ChainProductId, Is.GreaterThan(0));
+            });
+        }
+
+        [Test]
+        public async Task PurchaseOrder_ShouldBelongToChainProduct()
+        {
+            using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlite(connection)
+                .Options;
+
+            using (var context = new ApplicationDbContext(options))
+            {
+                await context.Database.EnsureCreatedAsync();
+
+                context.PurchaseOrders.Add(new PurchaseOrder
+                {
+                    Supplier = new Supplier { Name = "Test Manufacturer" },
+                    ChainProduct = new ChainProduct
+                    {
+                        Name = "Ролкова верига 08B-1",
+                        Category = new Category { Name = "Ролкови вериги" }
+                    },
+                    QuantityMeters = 50m,
+                    PurchasePricePerMeter = 10m
+                });
+
+                await context.SaveChangesAsync();
+            }
+
+            using var verificationContext = new ApplicationDbContext(options);
+
+            var order = await verificationContext.PurchaseOrders
+                .Include(p => p.ChainProduct)
+                .SingleAsync();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(order.ChainProduct, Is.Not.Null);
+                Assert.That(order.ChainProduct!.Name,
+                    Is.EqualTo("Ролкова верига 08B-1"));
+                Assert.That(order.ChainProductId, Is.GreaterThan(0));
             });
         }
     }

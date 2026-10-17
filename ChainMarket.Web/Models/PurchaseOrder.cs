@@ -14,6 +14,8 @@ namespace ChainMarket.Web.Models
         [Required]
         public int ChainProductId { get; set; }
 
+        public ChainProduct? ChainProduct { get; set; }
+
         public DateTime OrderDate { get; set; } = DateTime.Today;
 
         [Range(0.01, double.MaxValue)]

@@ -161,6 +161,8 @@ namespace ChainMarket.Web.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ChainProductId");
+
                     b.HasIndex("SupplierId");
 
                     b.ToTable("PurchaseOrders");
@@ -251,11 +253,19 @@ namespace ChainMarket.Web.Migrations
 
             modelBuilder.Entity("ChainMarket.Web.Models.PurchaseOrder", b =>
                 {
+                    b.HasOne("ChainMarket.Web.Models.ChainProduct", "ChainProduct")
+                        .WithMany()
+                        .HasForeignKey("ChainProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("ChainMarket.Web.Models.Supplier", "Supplier")
                         .WithMany()
                         .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("ChainProduct");
 
                     b.Navigation("Supplier");
                 });
