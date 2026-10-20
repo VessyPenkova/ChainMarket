@@ -25,12 +25,15 @@ The customer-facing website is in Bulgarian.
 ## Implemented Features
 
 - Product category navigation with images
+- Individual product details pages with technical specifications
+- Product image and technical drawing display when available
+- Technical information navigation from product catalogue
 - Product catalogue with category filtering and search
 - Product creation form
 - Normalized technical nomenclature and chain standards
 - Automatic product seeding
 - Purchase and selling prices in EUR
-- Metre-based and piece-based product units
+- Meter-based and piece-based product units
 - Stock availability calculations
 - Advance purchase-order draft calculations
 - Supplier and stock receipt models
@@ -85,7 +88,6 @@ The project currently has **44 passing tests** covering data validation, relatio
 
 The following features are planned or under development:
 
-- Product details and technical drawings
 - Shopping cart
 - Customer checkout
 - Complete customer ordering workflow
