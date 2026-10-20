@@ -1,0 +1,168 @@
+﻿@model ChainMarket.Web.Models.ChainProduct
+
+@{
+    ViewData["Title"] = Model.Name;
+
+    var unit = Model.SellingUnit == "pcs" ? "бр." : "м";
+    var price = Model.SellingPricePerUnit ?? Model.SellingPricePerMeter;
+    var standard = Model.ChainStandard?.Code ?? Model.Standard;
+}
+
+<section class="catalog-page">
+
+    <a asp-controller="ChainProducts"
+       asp-action="Index"
+       asp-route-categoryId="@Model.CategoryId"
+       class="catalog-back-link">
+        ← Обратно към категорията
+    </a>
+
+    <header class="catalog-header">
+        <h1>@Model.Name</h1>
+        <p>@Model.Category?.Name</p>
+    </header>
+
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+
+            <div class="product-image">
+
+                @if (!string.IsNullOrWhiteSpace(Model.ImagePath))
+                {
+                    <img src="@Url.Content(Model.ImagePath)"
+                         alt="@Model.Name"
+                         class="img-fluid"
+                         loading="lazy" />
+                }
+                else
+                {
+                    <div class="product-image-placeholder">
+                        <span>CHAINMARKET</span>
+                        <small>Снимка предстои</small>
+                    </div>
+                }
+
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.DrawingPath))
+            {
+                <div class="mt-4">
+                    <h2 class="h5">Технически чертеж</h2>
+
+                    <a href="@Url.Content(Model.DrawingPath)"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="btn btn-outline-secondary">
+                        Преглед на техническия чертеж
+                    </a>
+                </div>
+            }
+
+        </div>
+
+        <div class="col-lg-6">
+
+            <h2 class="h4">Технически характеристики</h2>
+
+            <table class="table table-striped">
+                <tbody>
+
+                    <tr>
+                        <th scope="row">Код на продукта</th>
+                        <td>@(Model.ChainCode ?? "—")</td>
+                    </tr>
+
+                    <tr>
+                        <th scope="row">Категория</th>
+                        <td>@Model.Category?.Name</td>
+                    </tr>
+
+                    @if (!string.IsNullOrWhiteSpace(standard))
+                    {
+                        <tr>
+                            <th scope="row">Стандарт</th>
+                            <td>@standard</td>
+                        </tr>
+                    }
+
+                    @if (Model.ChainNomenclature != null)
+                    {
+                        <tr>
+                            <th scope="row">Номенклатура</th>
+                            <td>@Model.ChainNomenclature.Code</td>
+                        </tr>
+                    }
+
+                    @if (Model.NumberOfStrands.HasValue)
+                    {
+                        <tr>
+                            <th scope="row">Брой редове</th>
+                            <td>@Model.NumberOfStrands</td>
+                        </tr>
+                    }
+
+                    @if (Model.PitchMm > 0)
+                    {
+                        <tr>
+                            <th scope="row">Стъпка</th>
+                            <td>@Model.PitchMm мм</td>
+                        </tr>
+                    }
+
+                    @if (Model.InnerWidthMm > 0)
+                    {
+                        <tr>
+                            <th scope="row">Вътрешна ширина</th>
+                            <td>@Model.InnerWidthMm мм</td>
+                        </tr>
+                    }
+
+                    @if (Model.RollerDiameterMm > 0)
+                    {
+                        <tr>
+                            <th scope="row">Диаметър на ролката</th>
+                            <td>@Model.RollerDiameterMm мм</td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+
+            <div class="product-price mt-4">
+                @price.ToString("F2") € / @unit
+                <small>Без ДДС</small>
+            </div>
+
+            <div class="product-availability mt-3">
+
+                @if (Model.StockQuantity > 0)
+                {
+                    <span class="in-stock">
+                        В наличност:
+                        @Model.StockQuantity.ToString("0.##") @unit
+                    </span>
+                }
+                else
+                {
+                    <span class="on-request">
+                        По предварителна заявка
+                    </span>
+                }
+
+            </div>
+
+            <div class="product-actions mt-4">
+                <button type="button"
+                        class="btn btn-primary"
+                        disabled
+                        title="Функцията за поръчки предстои">
+                    Добави в количката
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>

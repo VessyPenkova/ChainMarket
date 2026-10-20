@@ -32,7 +32,7 @@ namespace ChainMarket.Tests
 
             var controller = new ChainProductsController(context);
 
-            var result = await controller.Index();
+            var result = await controller.Index(context.ChainProducts.Single().CategoryId);
 
             var viewResult = result as ViewResult;
             Assert.That(viewResult, Is.Not.Null);

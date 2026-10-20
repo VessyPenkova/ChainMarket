@@ -437,6 +437,20 @@ body.chainmarket-page {
             cursor: not-allowed;
         }
 
+        /* Product technical information button */
+
+        .product-actions .btn.btn-outline-secondary {
+            background-color: #737980;
+            border-color: #737980;
+            color: #ffffff;
+        }
+
+            .product-actions .btn.btn-outline-secondary:hover:not(:disabled) {
+                background-color: #5f656b;
+                border-color: #5f656b;
+                color: #ffffff;
+            }
+
 /* No search results */
 
 .catalog-empty {

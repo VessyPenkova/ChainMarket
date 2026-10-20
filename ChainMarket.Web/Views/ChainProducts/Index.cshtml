@@ -89,7 +89,12 @@
                     </div>
 
                     <h2 class="product-title">
-                        @product.Name
+                        <a asp-controller="ChainProducts"
+                           asp-action="Details"
+                           asp-route-id="@product.Id"
+                           class="text-decoration-none">
+                            @product.Name
+                        </a>
                     </h2>
 
                     <div class="product-specifications">
@@ -150,12 +155,21 @@
                     </div>
 
                     <div class="product-actions">
+
+                        <a asp-controller="ChainProducts"
+                           asp-action="Details"
+                           asp-route-id="@product.Id"
+                           class="btn btn-outline-secondary">
+                            Техническа информация →
+                        </a>
+
                         <button type="button"
                                 class="btn btn-primary"
                                 disabled
                                 title="Функцията за поръчки предстои">
                             Добави в количката
                         </button>
+
                     </div>
 
                 </div>

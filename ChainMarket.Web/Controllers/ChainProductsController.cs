@@ -48,6 +48,25 @@ namespace ChainMarket.Web.Controllers
             return View(products);
         }
 
+
+
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var product = await _context.ChainProducts
+                .Include(p => p.Category)
+                .Include(p => p.ChainStandard)
+                .Include(p => p.ChainNomenclature)
+                .AsNoTracking()
+                .SingleOrDefaultAsync(p => p.Id == id && p.IsActive);
+
+            if (product == null)
+                return NotFound();
+
+            return View(product);
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -57,9 +76,7 @@ namespace ChainMarket.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(
-            [Bind("Name,CategoryId,ChainStandardId,ChainNomenclatureId,ChainCode")]
-            ChainProduct product)
+        public async Task<IActionResult> Create( [Bind("Name,CategoryId,ChainStandardId,ChainNomenclatureId,ChainCode")] ChainProduct product)
         {
             if (product.ChainNomenclatureId.HasValue)
             {
