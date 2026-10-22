@@ -84,7 +84,7 @@ ChainMarket/
 
 Automated tests are implemented with NUnit and EF Core SQLite in-memory databases.
 
-The project currently has **44 passing tests** covering data validation, relationships, stock calculations and nomenclature importing.
+The project currently has **61 passing tests** covering data validation, database relationships, stock calculations, nomenclature importing, shopping cart operations, controller validation and session storage.
 
 ## Development Status
 
