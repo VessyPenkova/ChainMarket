@@ -163,12 +163,24 @@
                             Техническа информация →
                         </a>
 
-                        <button type="button"
-                                class="btn btn-primary"
-                                disabled
-                                title="Функцията за поръчки предстои">
-                            Добави в количката
-                        </button>
+                        <form asp-controller="ShoppingCart"
+                              asp-action="Add"
+                              method="post">
+
+                            <input type="hidden"
+                                   name="productId"
+                                   value="@product.Id" />
+
+                            <input type="hidden"
+                                   name="quantity"
+                                   value="1" />
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                Добави в количката
+                            </button>
+
+                        </form>
 
                     </div>
 

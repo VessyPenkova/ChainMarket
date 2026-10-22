@@ -1,0 +1,126 @@
+﻿@model List<ChainMarket.Web.Models.ShoppingCartItem>
+
+@{
+    ViewData["Title"] = "Количка";
+    var total = Model.Sum(item => item.TotalPrice);
+}
+
+<section class="catalog-page">
+
+    <header class="catalog-header">
+        <h1>Количка</h1>
+        <p>Преглед на избраните продукти</p>
+    </header>
+
+    @if (!Model.Any())
+    {
+        <div class="catalog-empty">
+            <p>Вашата количка е празна.</p>
+
+            <a asp-controller="ChainProducts"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+                Разгледай продуктите
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Продукт</th>
+                        <th>Единична цена</th>
+                        <th>Количество</th>
+                        <th>Общо</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var unit = item.SellingUnit == "pcs" ? "бр." : "м";
+
+                        <tr>
+                            <td>
+                                <strong>@item.ProductName</strong>
+
+                                <div class="text-muted small">
+                                    @item.ChainCode
+                                </div>
+                            </td>
+
+                            <td>
+                                @item.UnitPrice.ToString("F2") € / @unit
+                            </td>
+
+                            <td>
+                                <form asp-controller="ShoppingCart"
+                                      asp-action="Update"
+                                      method="post"
+                                      class="d-flex gap-2">
+
+                                    <input type="hidden"
+                                           name="productId"
+                                           value="@item.ChainProductId" />
+
+                                    <input type="number"
+                                           name="quantity"
+                                           value="@item.Quantity.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                           min="@(item.SellingUnit == "pcs" ? "1" : "0.01")"
+                                           step="@(item.SellingUnit == "pcs" ? "1" : "0.01")"
+                                           class="form-control"
+                                           style="max-width: 100px"
+                                           required />
+
+                                    <button type="submit"
+                                            class="btn btn-outline-secondary">
+                                        Обнови
+                                    </button>
+                                </form>
+                            </td>
+
+                            <td>
+                                <strong>@item.TotalPrice.ToString("F2") €</strong>
+                            </td>
+
+                            <td>
+                                <form asp-controller="ShoppingCart"
+                                      asp-action="Remove"
+                                      method="post">
+
+                                    <input type="hidden"
+                                           name="productId"
+                                           value="@item.ChainProductId" />
+
+                                    <button type="submit"
+                                            class="btn btn-outline-danger">
+                                        Премахни
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="text-end mt-4">
+            <h3>Обща стойност: @total.ToString("F2") €</h3>
+            <p class="text-muted">Цени без ДДС</p>
+        </div>
+
+        <div class="mt-4">
+            <a asp-controller="ChainProducts"
+               asp-action="Index"
+               class="btn btn-outline-secondary">
+                ← Продължи пазаруването
+            </a>
+        </div>
+    }
+
+</section>

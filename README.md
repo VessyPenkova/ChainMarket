@@ -30,6 +30,10 @@ The customer-facing website is in Bulgarian.
 - Technical information navigation from product catalogue
 - Product catalogue with category filtering and search
 - Product creation form
+- Session-based shopping cart with add, update and remove functionality
+- Shopping cart support for meter-based and piece-based quantities
+- Shopping cart price and total calculations in EUR
+- Shopping cart validation and session persistence during application use
 - Normalized technical nomenclature and chain standards
 - Automatic product seeding
 - Purchase and selling prices in EUR
@@ -88,7 +92,6 @@ The project currently has **44 passing tests** covering data validation, relatio
 
 The following features are planned or under development:
 
-- Shopping cart
 - Customer checkout
 - Complete customer ordering workflow
 - Administration and access control
