@@ -22,6 +22,7 @@ The customer-facing website is in Bulgarian.
 - Stainless steel and special chains
 - Connecting links and accessories
 
+
 ## Implemented Features
 
 - Product category navigation with images
@@ -31,13 +32,18 @@ The customer-facing website is in Bulgarian.
 - Product catalogue with category filtering and search
 - Product creation form
 - Session-based shopping cart with add, update and remove functionality
-- Customer checkout form with customer information validation (work in progress)
-- Multi-product customer order entities and database relationships
-- Checkout order service with database-based pricing and VAT calculations
-- Order confirmation page
 - Shopping cart support for meter-based and piece-based quantities
 - Shopping cart price and total calculations in EUR
 - Shopping cart validation and session persistence during application use
+- Guest checkout for individual and company customers
+- Customer and delivery information collection and validation
+- Company invoice details (company name, EIK, VAT number, billing address)
+- Required-field validation for company orders
+- Multi-product customer orders and database relationships
+- Customer orders and order items saved to SQLite
+- Checkout order service with database-based pricing and 20% VAT calculations
+- Order confirmation page with unique order number
+- Shopping cart cleared after successful order creation
 - Normalized technical nomenclature and chain standards
 - Automatic product seeding
 - Purchase and selling prices in EUR
@@ -47,6 +53,7 @@ The customer-facing website is in Bulgarian.
 - Supplier and stock receipt models
 - Database relationships and validation
 - Responsive industrial-themed website
+
 
 ## Technology Stack
 
@@ -88,7 +95,7 @@ ChainMarket/
 
 Automated tests are implemented with NUnit and EF Core SQLite in-memory databases.
 
-The project currently has **72 passing tests** covering data validation, database relationships, stock calculations, nomenclature importing, shopping cart operations, controller validation, session storage, checkout form validation and customer order creation.
+The project currently has **77 passing tests** covering data validation, database relationships, stock calculations, nomenclature importing, shopping cart operations, controller validation, session storage, checkout form validation and customer order creation.
 
 ## Development Status
 

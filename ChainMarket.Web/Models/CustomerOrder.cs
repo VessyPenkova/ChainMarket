@@ -23,6 +23,22 @@ namespace ChainMarket.Web.Models
         [StringLength(300)]
         public string DeliveryAddress { get; set; } = string.Empty;
 
+        [Required]
+        [StringLength(20)]
+        public string CustomerType { get; set; } = "Individual";
+
+        [StringLength(200)]
+        public string? CompanyName { get; set; }
+
+        [StringLength(13)]
+        public string? CompanyEik { get; set; }
+
+        [StringLength(15)]
+        public string? CompanyVatNumber { get; set; }
+
+        [StringLength(300)]
+        public string? BillingAddress { get; set; }
+
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
 
         public decimal TotalWithoutVat { get; set; }

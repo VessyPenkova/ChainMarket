@@ -73,6 +73,44 @@ namespace ChainMarket.Tests
             Assert.That(errors.Any(e => e.MemberNames.Contains(nameof(model.DeliveryAddress))), Is.True);
         }
 
+
+        [Test]
+        public void Checkout_IndividualWithoutCompanyDetails_ShouldPassValidation()
+        {
+            var model = CreateValidModel();
+            model.CustomerType = "Individual";
+
+            Assert.That(Validate(model), Is.Empty);
+        }
+
+        [Test]
+        public void Checkout_CompanyWithoutInvoiceDetails_ShouldFailValidation()
+        {
+            var model = CreateValidModel();
+            model.CustomerType = "Company";
+
+            var errors = Validate(model);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(errors.Any(e => e.MemberNames.Contains(nameof(model.CompanyName))), Is.True);
+                Assert.That(errors.Any(e => e.MemberNames.Contains(nameof(model.CompanyEik))), Is.True);
+                Assert.That(errors.Any(e => e.MemberNames.Contains(nameof(model.BillingAddress))), Is.True);
+            });
+        }
+
+        [Test]
+        public void Checkout_CompanyWithValidInvoiceDetails_ShouldPassValidation()
+        {
+            var model = CreateValidModel();
+            model.CustomerType = "Company";
+            model.CompanyName = "Test Company Ltd.";
+            model.CompanyEik = "123456789";
+            model.BillingAddress = "Plovdiv, Bulgaria";
+
+            Assert.That(Validate(model), Is.Empty);
+        }
+
         private static CheckoutViewModel CreateValidModel()
         {
             return new CheckoutViewModel

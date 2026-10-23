@@ -4,6 +4,8 @@ using ChainMarket.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Console.WriteLine($"DATABASE PATH: {Path.GetFullPath("chainmarket.db")}");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(
         builder.Configuration.GetConnectionString("DefaultConnection")));
