@@ -31,6 +31,10 @@ The customer-facing website is in Bulgarian.
 - Product catalogue with category filtering and search
 - Product creation form
 - Session-based shopping cart with add, update and remove functionality
+- Customer checkout form with customer information validation (work in progress)
+- Multi-product customer order entities and database relationships
+- Checkout order service with database-based pricing and VAT calculations
+- Order confirmation page
 - Shopping cart support for meter-based and piece-based quantities
 - Shopping cart price and total calculations in EUR
 - Shopping cart validation and session persistence during application use
@@ -84,7 +88,7 @@ ChainMarket/
 
 Automated tests are implemented with NUnit and EF Core SQLite in-memory databases.
 
-The project currently has **61 passing tests** covering data validation, database relationships, stock calculations, nomenclature importing, shopping cart operations, controller validation and session storage.
+The project currently has **72 passing tests** covering data validation, database relationships, stock calculations, nomenclature importing, shopping cart operations, controller validation, session storage, checkout form validation and customer order creation.
 
 ## Development Status
 
@@ -92,7 +96,7 @@ The project currently has **61 passing tests** covering data validation, databas
 
 The following features are planned or under development:
 
-- Customer checkout
+- Customer checkout (work in progress: invoice details, order review and final validation)
 - Complete customer ordering workflow
 - Administration and access control
 - Stock receipts and supplier purchasing interfaces

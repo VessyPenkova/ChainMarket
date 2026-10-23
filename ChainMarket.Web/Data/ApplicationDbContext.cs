@@ -24,6 +24,18 @@ namespace ChainMarket.Web.Data
             
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<CustomerOrderItem>()
+                .HasOne(i => i.CustomerOrder)
+                .WithMany()
+                .HasForeignKey(i => i.CustomerOrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CustomerOrderItem>()
+                .HasOne(i => i.ChainProduct)
+                .WithMany()
+                .HasForeignKey(i => i.ChainProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<ChainStandard>()
                 .HasIndex(s => s.Code)
                 .IsUnique();
@@ -95,12 +107,13 @@ namespace ChainMarket.Web.Data
 
         public DbSet<Category> Categories { get; set; }
         public DbSet<ChainStandard> ChainStandards { get; set; }
-
         public DbSet<ChainNomenclature> ChainNomenclatures { get; set; }
         public DbSet<ChainProduct> ChainProducts { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<StockReceipt> StockReceipts { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
         public DbSet<ChainOrder> ChainOrders { get; set; }
+        public DbSet<CustomerOrder> CustomerOrders { get; set; }
+        public DbSet<CustomerOrderItem> CustomerOrderItems { get; set; }
     }
 }

@@ -256,6 +256,84 @@ namespace ChainMarket.Web.Migrations
                     b.ToTable("ChainStandards");
                 });
 
+            modelBuilder.Entity("ChainMarket.Web.Models.CustomerOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DeliveryAddress")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("TotalWithVat")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("TotalWithoutVat")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("VatAmount")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CustomerOrders");
+                });
+
+            modelBuilder.Entity("ChainMarket.Web.Models.CustomerOrderItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ChainProductId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CustomerOrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SellingUnit")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChainProductId");
+
+                    b.HasIndex("CustomerOrderId");
+
+                    b.ToTable("CustomerOrderItems");
+                });
+
             modelBuilder.Entity("ChainMarket.Web.Models.PurchaseOrder", b =>
                 {
                     b.Property<int>("Id")
@@ -422,6 +500,25 @@ namespace ChainMarket.Web.Migrations
                     b.Navigation("ChainNomenclature");
 
                     b.Navigation("ChainStandard");
+                });
+
+            modelBuilder.Entity("ChainMarket.Web.Models.CustomerOrderItem", b =>
+                {
+                    b.HasOne("ChainMarket.Web.Models.ChainProduct", "ChainProduct")
+                        .WithMany()
+                        .HasForeignKey("ChainProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ChainMarket.Web.Models.CustomerOrder", "CustomerOrder")
+                        .WithMany()
+                        .HasForeignKey("CustomerOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChainProduct");
+
+                    b.Navigation("CustomerOrder");
                 });
 
             modelBuilder.Entity("ChainMarket.Web.Models.PurchaseOrder", b =>

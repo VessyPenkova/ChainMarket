@@ -15,6 +15,8 @@ builder.Services.AddScoped<ShoppingCartService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ShoppingCartSessionStore>();
 
+builder.Services.AddScoped<CheckoutOrderService>();
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {

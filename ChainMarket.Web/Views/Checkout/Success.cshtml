@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Поръчката е приета";
+    int orderId = ViewBag.OrderId;
+}
+
+<section class="catalog-page">
+
+    <header class="catalog-header">
+        <h1>Поръчката е приета успешно!</h1>
+        <p>Благодарим ви, че избрахте ChainMarket.</p>
+    </header>
+
+    <div class="text-center py-4">
+
+        <h2 class="h4 mb-3">
+            Номер на поръчка: #@orderId
+        </h2>
+
+        <p>
+            Вашата поръчка е регистрирана успешно.
+        </p>
+
+        <p class="text-muted">
+            Това е потвърждение за получена поръчка, а не за извършено плащане.
+        </p>
+
+        <a asp-controller="ChainProducts"
+           asp-action="Index"
+           class="btn btn-primary mt-3">
+            Продължи пазаруването →
+        </a>
+
+    </div>
+
+</section>

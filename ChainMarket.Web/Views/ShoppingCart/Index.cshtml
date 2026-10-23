@@ -111,6 +111,14 @@
 
         <div class="text-end mt-4">
             <h3>Обща стойност: @total.ToString("F2") €</h3>
+
+            <a asp-controller="Checkout"
+               asp-action="Index"
+               class="btn btn-primary mt-3">
+                Завърши поръчката →
+            </a>
+
+
             <p class="text-muted">Цени без ДДС</p>
         </div>
 
